@@ -64,7 +64,7 @@ func (c *Cache) reapLoop(interval time.Duration) {
 	// This sucks. Since we are checking every 'interval', an entry
 	// might be created just after the ticker channel receives a tick,
 	// which means the entry won't be stale until the next tick, so in theory
-	// an entry's lifetime is (interval, 2*interval)
+	// an entry's lifetime is [interval, 2*interval)
 	for range ticker.C {
 		c.rw.Lock()
 

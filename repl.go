@@ -8,6 +8,7 @@ import (
 
 func initRepl() {
 
+	config := Config{}
 	fmt.Print("Gokedex > ")
 	for scanner := bufio.NewScanner(os.Stdin); scanner.Scan(); {
 		input := scanner.Text()
@@ -18,15 +19,24 @@ func initRepl() {
 			continue
 		}
 
-		command.callback()
+		err := command.callback(&config)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		fmt.Print("Gokedex > ")
 	}
+}
+
+type Config struct {
+	previousUrl, nextUrl *string
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(config *Config) error
 }
 
 func getCliCommands() map[string]cliCommand {
@@ -54,7 +64,7 @@ func getCliCommands() map[string]cliCommand {
 		},
 		"cached": {
 			name:        "cached",
-			description: "Display the current state of all caches",
+			description: "Display the current state of the GokeCache",
 			callback:    cacheCommand,
 		},
 	}

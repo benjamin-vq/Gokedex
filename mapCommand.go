@@ -6,14 +6,16 @@ import (
 	"github.com/benjamin-vq/gokedex/internal/gokeapi"
 )
 
-func mapNextCommand() error {
+func mapNextCommand(config *Config) error {
 
-	locs, err := gokeapi.GetLocations()
+	locs, err := gokeapi.GetLocations(config.nextUrl)
 
 	if err != nil {
-		fmt.Println("Could not get locations, try again later")
 		return err
 	}
+
+	config.previousUrl = locs.Previous
+	config.nextUrl = locs.Next
 
 	for _, loc := range locs.Results {
 		fmt.Printf("%s\n", loc.Name)
@@ -22,13 +24,15 @@ func mapNextCommand() error {
 	return nil
 }
 
-func mapPreviousCommand() error {
-	locs, err := gokeapi.GetPreviousLocations()
+func mapPreviousCommand(config *Config) error {
+	locs, err := gokeapi.GetPreviousLocations(config.previousUrl)
 
 	if err != nil {
-		fmt.Println("Could not get locations, try again later")
 		return err
 	}
+
+	config.previousUrl = locs.Previous
+	config.nextUrl = locs.Next
 
 	for _, loc := range locs.Results {
 		fmt.Printf("%s\n", loc.Name)

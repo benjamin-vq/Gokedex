@@ -9,19 +9,6 @@ import (
 	"time"
 )
 
-type Config struct {
-	Previous, Next *string
-}
-
-func NewConfig() *Config {
-	next := apiBaseURL + "/location-area/?offset=0&limit=20"
-
-	return &Config{
-		nil,
-		&next,
-	}
-}
-
 // https://mholt.github.io/json-to-go/2
 type LocationArea struct {
 	Count    int     `json:"count"`
@@ -35,27 +22,26 @@ type LocationArea struct {
 
 var (
 	locationCache = NewCache(120 * time.Second)
-	config        = NewConfig()
 )
 
 func GetLocationsCache() *Cache {
 	return locationCache
 }
 
-func GetLocations() (*LocationArea, error) {
+func GetLocations(url *string) (*LocationArea, error) {
 
-	if config.Next == nil {
-		log.Println("There are no more locations")
-		return nil, errors.New("no more locations")
+	locationUrl := apiBaseURL + "/location-area/?offset=0&limit=20"
+	if url != nil {
+		locationUrl = *url
 	}
 
-	cached, hit := getFromCache(config.Next)
+	cached, hit := getFromCache(&locationUrl)
 
 	if hit {
 		return cached, nil
 	}
 
-	res, err := http.Get(*config.Next)
+	res, err := http.Get(locationUrl)
 
 	if err != nil {
 		log.Printf("GET failed with error %v", err)
@@ -77,24 +63,21 @@ func GetLocations() (*LocationArea, error) {
 		return nil, err
 	}
 
-	locationCache.Add(*config.Next, body)
-	config.updateUrls(locations.Previous, locations.Next)
+	locationCache.Add(locationUrl, body)
 
 	return locations, nil
 }
 
-func GetPreviousLocations() (*LocationArea, error) {
+func GetPreviousLocations(url *string) (*LocationArea, error) {
 
-	if config.Previous == nil {
-		log.Println("Previous URL is nil, there are no previous locations")
+	if url == nil {
 		return nil, errors.New("there are no previous locations")
 	}
 
-	entry, hit := getFromCache(config.Previous)
+	entry, hit := getFromCache(url)
 
 	if hit {
 		log.Println("Entry retrieved from cache :)")
-		config.updateUrls(entry.Previous, entry.Next)
 		return entry, nil
 	}
 
@@ -106,21 +89,10 @@ func (loc *LocationArea) UnmarshalResponse(httpBytes []byte) error {
 	err := json.Unmarshal(httpBytes, &loc)
 
 	if err != nil {
-		log.Printf("Unable to marshal JSON response due to error %v", err)
 		return err
 	}
 
 	return nil
-}
-
-func (c *Config) updateUrls(previous, next *string) {
-
-	if previous == nil && next == nil {
-		log.Fatal("Both previous and next are nil, shouldnt happen")
-	}
-
-	c.Previous = previous
-	c.Next = next
 }
 
 func getFromCache(url *string) (locations *LocationArea, hit bool) {

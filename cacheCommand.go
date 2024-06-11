@@ -6,7 +6,7 @@ import (
 	"github.com/benjamin-vq/gokedex/internal/gokeapi"
 )
 
-func cacheCommand() error {
+func cacheCommand(config *Config) error {
 
 	cache := gokeapi.GetLocationsCache()
 
