@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func helpCommand(cpnfig *Config) error {
+func helpCommand(_ *Config, _ string) error {
 
 	commands := getCliCommands()
 

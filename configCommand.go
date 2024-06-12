@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func configCommand(config *Config) error {
+func configCommand(config *Config, _ string) error {
 
 	var nextUrl string
 	var previousUrl string

@@ -7,7 +7,7 @@ import (
 	"github.com/benjamin-vq/gokedex/internal/gokeapi"
 )
 
-func mapNextCommand(config *Config) error {
+func mapNextCommand(config *Config, _ string) error {
 
 	locs, err := gokeapi.GetLocations(config.nextUrl)
 
@@ -22,12 +22,10 @@ func mapNextCommand(config *Config) error {
 		fmt.Printf("%s\n", loc.Name)
 	}
 
-	configCommand(config)
-
 	return nil
 }
 
-func mapPreviousCommand(config *Config) error {
+func mapPreviousCommand(config *Config, _ string) error {
 
 	if config.previousUrl == nil {
 		// We just map'b to the beginning, reset nextUrl otherwise it

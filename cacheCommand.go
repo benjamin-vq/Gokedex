@@ -6,15 +6,23 @@ import (
 	"github.com/benjamin-vq/gokedex/internal/gokeapi"
 )
 
-func cacheCommand(config *Config) error {
+func cacheCommand(config *Config, _ string) error {
 
-	cache := gokeapi.GetLocationsCache()
+	locs := gokeapi.GetLocationsCache()
+	explore := gokeapi.GetExploreAreasCache()
 
 	log.Println("--------- Current Keys in Location Cache --------- ")
-	for key := range cache.Cache {
-		log.Printf("%s\n", key)
+	for key := range locs.Cache {
+		log.Println(key)
 
 	}
 	log.Println("--------- Current Keys in Location Cache --------- ")
+
+	log.Println("--------- Current Keys in Explore Cache --------- ")
+	for key := range explore.Cache {
+		log.Println(key)
+
+	}
+	log.Println("--------- Current Keys in Explore Cache --------- ")
 	return nil
 }

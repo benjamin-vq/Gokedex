@@ -35,7 +35,7 @@ func GetLocations(url *string) (*LocationArea, error) {
 		locationUrl = *url
 	}
 
-	cached, hit := getFromCache(&locationUrl)
+	cached, hit := getLocFromCache(&locationUrl)
 
 	if hit {
 		return cached, nil
@@ -57,7 +57,7 @@ func GetLocations(url *string) (*LocationArea, error) {
 	}
 
 	locations := &LocationArea{}
-	err = locations.UnmarshalResponse(body)
+	err = json.Unmarshal(body, locations)
 
 	if err != nil {
 		return nil, err
@@ -68,19 +68,7 @@ func GetLocations(url *string) (*LocationArea, error) {
 	return locations, nil
 }
 
-func (loc *LocationArea) UnmarshalResponse(httpBytes []byte) error {
-
-	err := json.Unmarshal(httpBytes, &loc)
-
-	if err != nil {
-		log.Printf("Unable to marshal JSON response due to error %v", err)
-		return err
-	}
-
-	return nil
-}
-
-func getFromCache(url *string) (locations *LocationArea, hit bool) {
+func getLocFromCache(url *string) (locations *LocationArea, hit bool) {
 
 	entry, hit := locationCache.Get(*url)
 
@@ -89,8 +77,10 @@ func getFromCache(url *string) (locations *LocationArea, hit bool) {
 	}
 
 	locations = &LocationArea{}
-	err := locations.UnmarshalResponse(entry)
+	err := json.Unmarshal(entry, locations)
 
+	// Should never happen, if it was cached it means it was previously
+	// unmarshalled
 	if err != nil {
 		return nil, false
 	}
