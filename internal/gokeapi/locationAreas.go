@@ -30,7 +30,7 @@ func GetLocationsCache() *Cache {
 
 func GetLocations(url *string) (*LocationArea, error) {
 
-	locationUrl := apiBaseURL + "/location-area/?offset=0&limit=20"
+	locationUrl := apiBaseURL + "/location-area?offset=0&limit=20"
 	if url != nil {
 		locationUrl = *url
 	}
@@ -44,7 +44,7 @@ func GetLocations(url *string) (*LocationArea, error) {
 	res, err := http.Get(locationUrl)
 
 	if err != nil {
-		log.Printf("GET failed with error %v", err)
+		log.Printf("GET failed with error %v\n", err)
 		return nil, err
 	}
 
@@ -52,7 +52,7 @@ func GetLocations(url *string) (*LocationArea, error) {
 	defer res.Body.Close()
 
 	if res.StatusCode > 299 || err != nil {
-		log.Printf("Response failed with status %d and body %s", res.StatusCode, body)
+		log.Printf("Response failed with status %d and body %s\n", res.StatusCode, body)
 		return nil, errors.New("invalid api response")
 	}
 
@@ -68,27 +68,12 @@ func GetLocations(url *string) (*LocationArea, error) {
 	return locations, nil
 }
 
-func GetPreviousLocations(url *string) (*LocationArea, error) {
-
-	if url == nil {
-		return nil, errors.New("there are no previous locations")
-	}
-
-	entry, hit := getFromCache(url)
-
-	if hit {
-		log.Println("Entry retrieved from cache :)")
-		return entry, nil
-	}
-
-	return nil, errors.New("could not find entry in cache")
-}
-
 func (loc *LocationArea) UnmarshalResponse(httpBytes []byte) error {
 
 	err := json.Unmarshal(httpBytes, &loc)
 
 	if err != nil {
+		log.Printf("Unable to marshal JSON response due to error %v", err)
 		return err
 	}
 

@@ -67,5 +67,10 @@ func getCliCommands() map[string]cliCommand {
 			description: "Display the current state of the GokeCache",
 			callback:    cacheCommand,
 		},
+		"config": {
+			name:        "config",
+			description: "Display the current state of the previous and next URLs",
+			callback:    configCommand,
+		},
 	}
 }

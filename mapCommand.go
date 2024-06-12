@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/benjamin-vq/gokedex/internal/gokeapi"
@@ -21,11 +22,23 @@ func mapNextCommand(config *Config) error {
 		fmt.Printf("%s\n", loc.Name)
 	}
 
+	configCommand(config)
+
 	return nil
 }
 
 func mapPreviousCommand(config *Config) error {
-	locs, err := gokeapi.GetPreviousLocations(config.previousUrl)
+
+	if config.previousUrl == nil {
+		// We just map'b to the beginning, reset nextUrl otherwise it
+		// may point to the second batch of locations
+		// Example: Without this line, here is what happened:
+		// launch the program -> map -> mapb -> nextUrl now points to the second batch
+		config.nextUrl = nil
+		return errors.New("there are no previous locations")
+	}
+
+	locs, err := gokeapi.GetLocations(config.previousUrl)
 
 	if err != nil {
 		return err
