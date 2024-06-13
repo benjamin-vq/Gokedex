@@ -9,15 +9,28 @@ import (
 	"time"
 )
 
+// OOP-brained
 var (
 	pokemonCache = NewCache(120 * time.Second)
+	pokedex      = NewPokedex()
 )
 
 func GetPokemonCache() *Cache {
 	return pokemonCache
 }
 
+func GetPokedex() *Pokedex {
+	return pokedex
+}
+
 func CatchPokemon(arg *string) (caught bool, name string, err error) {
+
+	p, ok := pokedex.Entries[*arg]
+
+	if ok {
+		return true, p.Name, nil
+	}
+
 	pokemonUrl := apiBaseURL + "/pokemon/" + *arg
 
 	pokemon, err := getPokemon(&pokemonUrl)
@@ -30,6 +43,7 @@ func CatchPokemon(arg *string) (caught bool, name string, err error) {
 	chance := catchChance(baseExp)
 
 	if chance > .5 {
+		pokedex.Entries[*arg] = pokemon
 		caught = true
 	}
 

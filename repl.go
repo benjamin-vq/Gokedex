@@ -20,7 +20,6 @@ func initRepl() {
 
 		cmd, arg := parseInput(scanner.Text())
 
-		fmt.Printf("Received input: '%s'\n", scanner.Text())
 		command, ok := getCliCommands()[cmd]
 
 		if !ok {
@@ -91,6 +90,11 @@ func getCliCommands() map[string]cliCommand {
 			name:        "catch [NAME|ID]",
 			description: "Attempt to catch a pokemon by providing a name or an id",
 			callback:    catchCommand,
+		},
+		"inspect": {
+			name:        "inspect [NAME]",
+			description: "Display information about a pokemon in your pokedex",
+			callback:    inspectCommand,
 		},
 		// Extra commands, for debugging purposes
 		"cached": {
